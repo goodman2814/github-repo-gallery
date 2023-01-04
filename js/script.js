@@ -36,7 +36,7 @@ const displayInfo = function (info) {
 
 getInfo();
 
-
+// function to pull and display repos from the GitHub API
 const getRepos = async function () {
     const res = await fetch(
         `https://api.github.com/users/${username}/repos?sort=updated&per_page=100`
@@ -45,6 +45,7 @@ const getRepos = async function () {
     displayRepos(data);
 };
 
+// function to display the repos that have been pulled
 const displayRepos = function (repos) {
     for (const repo of repos) {
         const repoLi = document.createElement('li');
@@ -54,6 +55,7 @@ const displayRepos = function (repos) {
     }
 };
 
+// Event listener to select a single repo
 repoList.addEventListener('click', function (e) {
     if (e.target.matches('h3')) {
         let repoName = e.target.innerText;
@@ -61,25 +63,32 @@ repoList.addEventListener('click', function (e) {
     }
 });
 
+// function to pull and display information from a single repo
 singleRepoData = async function (repoName) {
     const res = await fetch(
         `https://api.github.com/repos/${username}/${repoName}`
     );
     const repoInfo = await res.json();
-    // console.log(repoInfo);
+
+    // pull specific code languages
     const fetchLanguages = await fetch(repoInfo.languages_url);
     const languageData = await fetchLanguages.json();
-    // console.log(languageData);
 
+    // create an array of languages
     const languages = [];
     for (const language in languageData) {
         languages.push(language);
     }
+
     displayRepoInfo(repoInfo, languages);
 }
 
+// function to display the info pulled for a single repo
 const displayRepoInfo = function (repoInfo, languages) {
     repoData.innerHTML = '';
+    repoData.classList.remove('hide');
+    allRepoInfo.classList.add('hide');
+
     const repoDiv = document.createElement('div');
     repoDiv.innerHTML = `<h3>Name: ${repoInfo.name}</h3>
         <p>Description: ${repoInfo.description}</p>
@@ -87,6 +96,4 @@ const displayRepoInfo = function (repoInfo, languages) {
         <p>Languages: ${languages.join(", ")}</p>
         <a class="visit" href="${repoInfo.html_url}" target="_blank" rel="noreferrer noopener">View Repo on GitHub!</a>`
     repoData.append(repoDiv)
-    repoData.classList.remove('hide');
-    allRepoInfo.classList.add('hide');
 }
